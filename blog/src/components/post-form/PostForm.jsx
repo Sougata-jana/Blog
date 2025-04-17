@@ -20,19 +20,23 @@ export default function PostForm({ post }) {
     const userData = useSelector((state) => state.auth.userData);
 
     const submit = async (data) => {
-        try{
+        try {
             if (post) {
                 const file = data.image?.[0] ? await service.uploadFile(data.image[0]) : null;
-
+    
                 if (file) {
+                    console.log("Uploaded file:", file);
                     await service.deletePost(post.featuredImage);
                 }
-
+    
                 const dbPost = await service.updatePost(post.$id, {
                     ...data,
                     featuredImage: file ? file.$id : post.featuredImage,
+                    postId: post.postId,
                 });
-
+    
+                console.log("Updated post response:", dbPost);
+    
                 if (dbPost) {
                     navigate(`/post/${dbPost.$id}`);
                 } else {
@@ -43,19 +47,24 @@ export default function PostForm({ post }) {
                     console.error("No file selected for upload.");
                     return;
                 }
-
+    
                 const file = await service.uploadFile(data.image[0]);
-
+                console.log("Uploaded file:", file);
+    
                 if (file) {
                     const fileId = file.$id;
                     data.featuredImage = fileId;
-
+    
+                    console.log("userData:", userData);
+    
                     const dbPost = await service.createPost({
                         ...data,
                         postId: ID.unique(),
                         userid: userData.$id,
                     });
-
+    
+                    console.log("Created post response:", dbPost);
+    
                     if (dbPost) {
                         navigate(`/post/${dbPost.$id}`);
                     } else {
