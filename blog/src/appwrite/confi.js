@@ -27,13 +27,13 @@ export class Service{
         }
     }
 
-    async updatePost(ID, {title, content, featuredImage, status}) {
+    async updatePost(ID, {title, content, featuredImage, status, postId}) {
         try {
             return await this.databases.updateDocument(
                 conf.appwriteDatabaseId,
                 conf.appwriteCollectionID,
                 ID,
-                { title, content, featuredImage, status }
+                { title, content, featuredImage, status, postId }
             );
         } catch (error) {
             console.error("Appwrite service :: updatePost :: error", error.message);
@@ -85,7 +85,7 @@ export class Service{
     async uploadFile(file) {
         try {
             const response = await this.bucket.createFile(
-                conf.appwriteBuckeyId,
+                conf.appwriteBucketId,
                 ID.unique(),
                 file
             );
@@ -100,7 +100,7 @@ export class Service{
     async deletefile(fileId) {
         try {
             await this.bucket.deleteFile(
-                conf.appwriteBuckeyId,
+                conf.appwriteBucketId,
                 fileId
             );
             return true;
@@ -113,12 +113,24 @@ export class Service{
     getFilePreview(fileId) {
         try {
             return this.bucket.getFilePreview(
-                conf.appwriteBuckeyId,
+                conf.appwriteBucketId,
                 fileId
             );
         } catch (error) {
             console.error("Appwrite service :: getFilePreview :: error", error.message);
             throw new Error("Failed to get file preview. Please try again.");
+        }
+    }
+
+    getFileView(fileId) {
+        try {
+            return this.bucket.getFileView(
+                conf.appwriteBucketId,
+                fileId
+            );
+        } catch (error) {
+            console.error("Appwrite service :: getFileView :: error", error.message);
+            throw new Error("Failed to get file view. Please try again.");
         }
     }
 }

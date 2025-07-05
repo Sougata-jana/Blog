@@ -24,47 +24,44 @@ export default function Post() {
     }, [slug, navigate]);
 
     const deletePost = () => {
-               service.deletePost(post.$id).then((status) => {
+        service.deletePost(post.$id).then((status) => {
             if (status) {
-               service.deletefile(post.featuredImage);
+                service.deletefile(post.featuredImage);
                 navigate("/");
             }
         });
     };
 
     return post ? (
-        <div className="py-8">
+        <div className="w-full min-h-screen py-8" style={{ background: '#f5f5f5' }}>
             <Container>
-                <div className="w-full flex justify-center mb-4 relative border rounded-xl p-2">
+                <div className="w-full flex justify-center mb-4 relative border border-gray-200 rounded-xl p-4 bg-white shadow-sm font-sans">
                     <img
                         src={service.getFilePreview(post.featuredImage)}
                         alt={post.title}
-                        className="rounded-xl"
+                        className="rounded-xl w-64 h-64 object-cover object-center border border-gray-100"
                         onError={(e) => {
-                            console.error("Image failed to load", e);
-                            e.currentTarget.src = "/path/to/fallback-image.jpg"; // Provide a fallback image
+                            e.currentTarget.src = "/path/to/fallback-image.jpg";
                         }}
                     />
 
                     {isAuthor && (
-                        <div className="absolute right-6 top-6">
+                        <div className="absolute right-6 top-6 flex gap-2">
                             <Link to={`/edit-post/${post.$id}`}>
-                                <Button bgColor="bg-green-500" className="mr-3">
-                                    Edit
-                                </Button>
+                                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md">Edit</Button>
                             </Link>
-                            <Button bgColor="bg-red-500" onClick={deletePost}>
+                            <Button className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-md" onClick={deletePost}>
                                 Delete
                             </Button>
                         </div>
                     )}
                 </div>
                 <div className="w-full mb-6">
-                    <h1 className="text-2xl font-bold">{post.title}</h1>
+                    <h1 className="text-2xl font-bold text-gray-800 font-sans">{post.title}</h1>
                 </div>
-                <div className="browser-css">
+                <div className="browser-css text-left font-sans">
                     {parse(post.content)}
-                    </div>
+                </div>
             </Container>
         </div>
     ) : null;

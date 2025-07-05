@@ -23,59 +23,40 @@ export default function PostForm({ post }) {
         try {
             if (post) {
                 const file = data.image?.[0] ? await service.uploadFile(data.image[0]) : null;
-    
+
                 if (file) {
-                    console.log("Uploaded file:", file);
                     await service.deletePost(post.featuredImage);
                 }
-    
+
                 const dbPost = await service.updatePost(post.$id, {
                     ...data,
                     featuredImage: file ? file.$id : post.featuredImage,
                     postId: post.postId,
                 });
-    
-                console.log("Updated post response:", dbPost);
-    
+
                 if (dbPost) {
                     navigate(`/post/${dbPost.$id}`);
-                } else {
-                    console.error("Failed to update the post.");
                 }
             } else {
                 if (!data.image || !data.image[0]) {
-                    console.error("No file selected for upload.");
                     return;
                 }
-    
+
                 const file = await service.uploadFile(data.image[0]);
-                console.log("Uploaded file:", file);
-    
                 if (file) {
-                    const fileId = file.$id;
-                    data.featuredImage = fileId;
-    
-                    console.log("userData:", userData);
-    
+                    data.featuredImage = file.$id;
                     const dbPost = await service.createPost({
                         ...data,
                         postId: ID.unique(),
                         userid: userData.$id,
                     });
-    
-                    console.log("Created post response:", dbPost);
-    
                     if (dbPost) {
                         navigate(`/post/${dbPost.$id}`);
-                    } else {
-                        console.error("Failed to create the post.");
                     }
-                } else {
-                    console.error("File upload failed.");
                 }
             }
         } catch (error) {
-            console.error("An error occurred during form submission:", error);
+            // Optionally show error to user
         }
     };
 
@@ -86,7 +67,6 @@ export default function PostForm({ post }) {
                 .toLowerCase()
                 .replace(/[^a-zA-Z\d\s]+/g, "-")
                 .replace(/\s/g, "-");
-
         return "";
     }, []);
 
@@ -96,63 +76,71 @@ export default function PostForm({ post }) {
                 setValue("slug", slugTransform(value.title), { shouldValidate: true });
             }
         });
-
         return () => subscription.unsubscribe();
     }, [watch, slugTransform, setValue]);
 
     return (
-        <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
-            <div className="w-2/3 px-2">
-                <Input
-                    label="Title :"
-                    placeholder="Title"
-                    className="mb-4"
-                    {...register("title", { required: true, name: "title" })}
-                />
-                <Input
-                    label="Slug :"
-                    placeholder="Slug"
-                    className="mb-4"
-                    {...register("slug", { required: true, name: "slug" })}
-                    onInput={(e) => {
-                        setValue("slug", slugTransform(e.currentTarget.value), { shouldValidate: true });
-                    }}
-                />
-                <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")}  />
-            </div>
-            <div className="w-1/3 px-2">
-                <Input
-                    label="Featured Image :"
-                    type="file"
-                    className="mb-4"
-                    accept="image/png, image/jpg, image/jpeg, image/gif"
-                    {...register("image", { required: !post, name: "image" })}
-                />
-                {post && post.featuredImage && (
-                    <div className="w-full mb-4">
-                        {console.log("Featured Image ID:", post?.featuredImage)}
-                        {console.log("Preview URL:", service.getFilePreview(post?.featuredImage))}
-                        <img
-                            src={service.getFilePreview(post.featuredImage)}
-                            alt={post.title}
-                            className="rounded-lg"
-                            onError={(e) => {
-                                console.error("Image failed to load. File ID:", post.featuredImage, "Error:", e);
-                                e.currentTarget.src = "/fallback-image.jpg"; // Ensure this path is valid
-                            }}
-                        />
-                    </div>
-                )}
-                <Select
-                    options={["active", "inactive"]}
-                    label="Status"
-                    className="mb-4"
-                    {...register("status", { required: true, name: "status" })}
-                />
-                <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full bg-gray-900">
+        <div className="w-full min-h-screen flex items-center justify-center" style={{ background: '#f5f5f5' }}>
+            <form onSubmit={handleSubmit(submit)} className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-10 flex flex-col gap-8 border border-gray-100">
+                <div>
+                    <label className="block font-bold mb-2 text-gray-800 text-lg">Title</label>
+                    <Input
+                        placeholder="Enter a title..."
+                        className="mb-2 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white text-black px-4 py-2 text-base"
+                        {...register("title", { required: true, name: "title" })}
+                    />
+                </div>
+                <div>
+                    <label className="block font-bold mb-2 text-gray-800 text-lg">Slug</label>
+                    <Input
+                        placeholder="Auto-generated from title"
+                        className="mb-2 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white text-black px-4 py-2 text-base"
+                        {...register("slug", { required: true, name: "slug" })}
+                        onInput={(e) => {
+                            setValue("slug", slugTransform(e.currentTarget.value), { shouldValidate: true });
+                        }}
+                    />
+                </div>
+                <div>
+                    <label className="block font-bold mb-2 text-gray-800 text-lg">Content</label>
+                    <RTE name="content" control={control} defaultValue={getValues("content")} />
+                </div>
+                <div>
+                    <label className="block font-bold mb-2 text-gray-800 text-lg">Featured Image</label>
+                    <Input
+                        type="file"
+                        className="mb-2 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white text-black px-4 py-2 text-base"
+                        accept="image/png, image/jpg, image/jpeg, image/gif"
+                        {...register("image", { required: !post, name: "image" })}
+                    />
+                    {post && post.featuredImage && (
+                        <div className="w-full mb-2 flex flex-col items-center">
+                            <img
+                                src={service.getFilePreview(post.featuredImage)}
+                                alt={post.title}
+                                className="rounded-xl border border-gray-200 w-32 h-32 object-cover object-center mt-2"
+                                onError={(e) => {
+                                    e.currentTarget.src = "/fallback-image.jpg";
+                                }}
+                            />
+                        </div>
+                    )}
+                </div>
+                <div>
+                    <label className="block font-bold mb-2 text-gray-800 text-lg">Status</label>
+                    <Select
+                        options={["active", "inactive"]}
+                        className="mb-2 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white text-black px-4 py-2 text-base"
+                        {...register("status", { required: true, name: "status" })}
+                    />
+                </div>
+                <Button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow hover:bg-blue-700 transition-all duration-200 border-none outline-none text-lg"
+                >
                     {post ? "Update" : "Submit"}
                 </Button>
-            </div>
-        </form>
+            </form>
+        </div>
     );
 }
