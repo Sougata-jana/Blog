@@ -16,14 +16,17 @@ function AllPost() {
     }, []);
 
     return (
-        <div className='w-full min-h-screen py-8' style={{ background: '#f5f5f5' }}>
+        <div className='w-full min-h-screen py-8 bg-gradient-to-br from-blue-50 to-blue-100'>
             <Container>
-                <div className='flex flex-wrap'>
-                    {posts.map((post) => (
-                        <div key={post.$id} className='p-2 w-1/3'>
-                            <PostCard post={post} />
-                        </div>
-                    ))}
+                <h2 className='text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center font-sans'>All Posts</h2>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
+                    {posts.length === 0 ? (
+                        <div className='col-span-full text-center text-lg text-gray-500'>No posts available.</div>
+                    ) : (
+                        posts.map((post) => (
+                            <PostCard key={post.$id} {...post} />
+                        ))
+                    )}
                 </div>
             </Container>
         </div>

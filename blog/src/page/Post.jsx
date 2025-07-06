@@ -33,13 +33,13 @@ export default function Post() {
     };
 
     return post ? (
-        <div className="w-full min-h-screen py-8" style={{ background: '#f5f5f5' }}>
+        <div className="w-full min-h-screen py-8 bg-gradient-to-br from-blue-50 to-blue-100">
             <Container>
-                <div className="w-full flex justify-center mb-4 relative border border-gray-200 rounded-xl p-4 bg-white shadow-sm font-sans">
+                <div className="w-full flex flex-col items-center mb-4 relative border border-gray-200 rounded-xl p-6 bg-white shadow-lg font-sans">
                     <img
                         src={service.getFilePreview(post.featuredImage)}
                         alt={post.title}
-                        className="rounded-xl w-64 h-64 object-cover object-center border border-gray-100"
+                        className="rounded-xl w-64 h-64 object-cover object-center border border-gray-100 mb-4 shadow"
                         onError={(e) => {
                             e.currentTarget.src = "/path/to/fallback-image.jpg";
                         }}
@@ -56,10 +56,10 @@ export default function Post() {
                         </div>
                     )}
                 </div>
-                <div className="w-full mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800 font-sans">{post.title}</h1>
+                <div className="w-full mb-6 text-center">
+                    <h1 className="text-3xl font-extrabold text-gray-800 font-sans mb-2">{post.title}</h1>
                 </div>
-                <div className="browser-css text-left font-sans">
+                <div className="browser-css text-left font-sans bg-white rounded-xl p-6 shadow">
                     {parse(post.content)}
                 </div>
             </Container>
