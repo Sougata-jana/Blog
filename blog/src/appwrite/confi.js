@@ -112,13 +112,12 @@ export class Service{
 
     getFilePreview(fileId) {
         try {
-            return this.bucket.getFilePreview(
-                conf.appwriteBucketId,
-                fileId
-            );
+            const url = this.bucket.getFilePreview(conf.appwriteBucketId, fileId);
+            return url;
         } catch (error) {
-            console.error("Appwrite service :: getFilePreview :: error", error.message);
-            throw new Error("Failed to get file preview. Please try again.");
+            console.error("Appwrite service :: getFilePreview :: error", error);
+            // As a fallback, you can return a URL to a default/placeholder image
+            return 'https://via.placeholder.com/150'; // Example placeholder
         }
     }
 

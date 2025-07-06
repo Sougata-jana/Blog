@@ -31,7 +31,6 @@ export default function PostForm({ post }) {
                 const dbPost = await service.updatePost(post.$id, {
                     ...data,
                     featuredImage: file ? file.$id : post.featuredImage,
-                    postId: post.postId,
                 });
 
                 if (dbPost) {
@@ -47,7 +46,6 @@ export default function PostForm({ post }) {
                     data.featuredImage = file.$id;
                     const dbPost = await service.createPost({
                         ...data,
-                        postId: ID.unique(),
                         userid: userData.$id,
                     });
                     if (dbPost) {
